@@ -1,0 +1,21 @@
+{
+  "name": "backend",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Ticket Management Syatem",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "author": "Ritank Saxena",
+  "license": "ISC",
+  "dependencies": {
+    "circular-json": "^0.5.9",
+    "cors": "^2.8.5",
+    "discord.js": "^14.14.1",
+    "express": "^4.18.3",
+    "nodemailer": "^6.9.11",
+    "nodemon": "^3.1.0"
+  }
+}
