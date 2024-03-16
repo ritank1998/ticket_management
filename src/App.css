@@ -36,3 +36,12 @@
     transform: rotate(360deg);
   }
 }
+.head{
+  color: azure;
+}
+.btn{
+  border-radius: 15px;
+}
+.navbar{
+  background-color: #152F4F;
+}
