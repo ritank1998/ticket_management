@@ -1,5 +1,6 @@
 import express from "express"
 import cors from "cors"
+import "./db/connection/conn.js"
 const app = express()
 import tickets from "./router/router.js"
 

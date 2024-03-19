@@ -1,4 +1,5 @@
 import CircularJson from "circular-json"
+import { newUsers } from "../db/connection/conn.js";
 import nodemailer from "nodemailer"
 
 
@@ -46,3 +47,45 @@ export const sendEmail = async (req, res) => {
         res.status(500).json(CircularJson.stringify({ error: error.message }));
     }
 };
+
+
+export const registerUsers = async(req,res)=>{
+    const {Name , number , email , Issue , pass} = req.body
+    try{
+         const users = newUsers({
+            Name,
+            number,
+            email,
+            Issue,
+            pass
+         })
+         const registeredClients = await users.save()
+         res.status(200).json(CircularJson.stringify({registeredClients}))
+    }
+    catch(err){
+        res.status(500).json(CircularJson.stringify({err: err.message}))
+    }
+}
+
+export const loginToSystem = async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        console.log(email, password);
+        const user = await newUsers.findOne({ email: email });
+        console.log(user);
+
+        if (!user) {
+            return res.status(404).json(CircularJson.stringify({ error: "User Not Found" }));
+        }
+
+        const userPass = user.pass;
+        if (userPass === password) {
+            return res.status(200).json(CircularJson.stringify({ user }));
+        } else {
+            return res.status(401).json(CircularJson.stringify({ error: "Invalid Username or Password" }));
+        }
+
+    } catch (err) {
+        return res.status(500).json(CircularJson.stringify({ error: err.message }));
+    }
+}
