@@ -1,8 +1,24 @@
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
+
 
 const Body = () => {
     const [subject, setSubject] = useState('');
     const [des, setDes] = useState('');
+
+
+    useEffect(() => {
+
+
+        // Delete JWT from session storage every 10 seconds
+        const deleteToken = setInterval(() => {
+            sessionStorage.removeItem('token');
+            alert("Session Expired, Please Login Again !!!");
+            window.location.replace('/login');
+        }, 5*60*1000); //5 minutes
+
+        return () => clearInterval(deleteToken);
+    }, []); 
+
 
     const takeSubject = (e) => {
         setSubject(e.target.value);
@@ -13,6 +29,12 @@ const Body = () => {
     }
 
     const handleSubmit = async () => {
+        const token =  sessionStorage.getItem('token')
+        if(!token){
+            alert("Session Expired , Please Login Again !!!")
+            window.location.replace('/login');
+            return;
+        }
         const payload = {
             subject,
             des

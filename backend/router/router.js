@@ -6,7 +6,7 @@ const router = express.Router()
 
 router.post("/sendticket" , sendEmail)
 router.post("/login" , registerUsers)
-router.get("/signin" , loginToSystem)
+router.post("/signin" , loginToSystem)
 
 
 export default router

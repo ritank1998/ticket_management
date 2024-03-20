@@ -1,6 +1,10 @@
 import CircularJson from "circular-json"
 import { newUsers } from "../db/connection/conn.js";
 import nodemailer from "nodemailer"
+import jwt from "jsonwebtoken"
+import cron from "node-cron"
+
+
 
 
 let transporter = nodemailer.createTransport({
@@ -10,6 +14,28 @@ let transporter = nodemailer.createTransport({
         pass: 'wdufgyawvizccnwc '
     }
 });
+
+// Function to generate JWT token
+const generateToken = (userId) => {
+    return jwt.sign({ userId }, 'ticketManagement21021998', { expiresIn: '1m' }); // Token expires in 1 minute
+};
+
+// Middleware to verify JWT token
+export const verifyToken = (req, res, next) => {
+    const token = req.headers.authorization;
+    if (!token) {
+        console.log("Token is required")
+    }
+
+    try {
+        const decoded = jwt.verify(token, 'ticketManagement21021998');
+        req.userId = decoded.userId;
+        next();
+    } catch (error) {
+       console.log("Invalid Token")
+    }
+};
+
 
 export const sendEmail = async (req, res) => {
     const { subject, des } = req.body;
@@ -49,21 +75,21 @@ export const sendEmail = async (req, res) => {
 };
 
 
-export const registerUsers = async(req,res)=>{
-    const {Name , number , email , Issue , pass} = req.body
-    try{
-         const users = newUsers({
+export const registerUsers = async (req, res) => {
+    const { Name, number, email, Issue, pass } = req.body
+    try {
+        const users = newUsers({
             Name,
             number,
             email,
             Issue,
             pass
-         })
-         const registeredClients = await users.save()
-         res.status(200).json(CircularJson.stringify({registeredClients}))
+        })
+        const registeredClients = await users.save()
+        res.status(200).json(CircularJson.stringify({ registeredClients }))
     }
-    catch(err){
-        res.status(500).json(CircularJson.stringify({err: err.message}))
+    catch (err) {
+        res.status(500).json(CircularJson.stringify({ err: err.message }))
     }
 }
 
@@ -75,17 +101,25 @@ export const loginToSystem = async (req, res) => {
         console.log(user);
 
         if (!user) {
-            return res.status(404).json(CircularJson.stringify({ error: "User Not Found" }));
+            return res.status(404).json({ error: "User Not Found" });
         }
 
         const userPass = user.pass;
         if (userPass === password) {
-            return res.status(200).json(CircularJson.stringify({ user }));
+            const token = generateToken(user._id);
+            
+            // Send JWT token in response
+            return res.status(200).json({ user, token });
         } else {
-            return res.status(401).json(CircularJson.stringify({ error: "Invalid Username or Password" }));
+            return res.status(401).json({ error: "Invalid Username or Password" });
         }
 
     } catch (err) {
-        return res.status(500).json(CircularJson.stringify({ error: err.message }));
+        return res.status(500).json({ error: err.message });
     }
 }
+
+const verifyTokenExpiration = () => {
+   const token = sessionStorage.removeItem('token')
+   return token
+};
